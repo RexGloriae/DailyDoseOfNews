@@ -10,10 +10,12 @@ class Database:
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             source TEXT,
             title TEXT,
+            author TEXT,
             url TEXT UNIQUE,
+            category TEXT,
             published_at TEXT,
             content TEXT,
-            author TEXT
+            description TEXT
             )
         ''')
         conn.commit()
@@ -41,3 +43,21 @@ class Database:
             print(f"[INFO] Article already exists in DB: {article['url']}")
         finally:
             conn.close()
+
+    def get_all_articles(self):
+        conn = sqlite3.connect(self.db_name)
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+        c.execute('SELECT * FROM articles')
+        rows = c.fetchall()
+        conn.close()
+        articles = [dict(row) for row in rows]
+        return articles
+    
+    def article_exists(self, url):
+        conn = sqlite3.connect(self.db_name)
+        c = conn.cursor()
+        c.execute("SELECT 1 FROM articles WHERE url = ?", (url,))
+        exists = c.fetchone() is not None
+        conn.close()
+        return exists
