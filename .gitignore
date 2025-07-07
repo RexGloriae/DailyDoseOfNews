@@ -10,6 +10,7 @@ __pycache__/
 .Python
 build/
 /src/hidden/
+news.db
 develop-eggs/
 dist/
 downloads/
