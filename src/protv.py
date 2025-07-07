@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from parser import download_site, conv_relative_date
 from urllib.parse import urljoin
+from llm import get_description
 
 class ProTV:
     def __init__(self):
@@ -51,6 +52,8 @@ class ProTV:
             author = self.get_author(curr_art)
             category = self.get_category(curr_art)
 
+            description = get_description(link)
+
             results.append({
                 "source": "ProTV",
                 "title": title,
@@ -58,7 +61,8 @@ class ProTV:
                 "url": link,
                 "category": category,
                 "published_at": published_str,
-                "content": content
+                "content": content,
+                "description": description
             })
 
         return results

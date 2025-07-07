@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from parser import download_site, conv_relative_date
 from urllib.parse import urljoin
+from llm import get_description
 
 class EuroNews:
     def __init__(self):
@@ -44,6 +45,8 @@ class EuroNews:
 
             article = download_site(link)
             author = self.get_author(article)
+
+            description = get_description(link)
     
             results.append({
                 "source": self.SITE,
@@ -52,7 +55,8 @@ class EuroNews:
                 "url": link,
                 "category": category,
                 "published_at": published_str,
-                "content": content
+                "content": content,
+                "description": description
             })
     
         return results
