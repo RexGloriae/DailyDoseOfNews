@@ -3,11 +3,13 @@ from datetime import datetime
 from parser import download_site, conv_relative_date
 from urllib.parse import urljoin
 from llm import get_description
+from database import Database
 
 class EuroNews:
     def __init__(self):
         self.SITE = "EuroNews"
         self.URL = "https://www.euronews.ro/ultimele-stiri"
+        self.load_list()
 
     def load_list(self):
         self.html = download_site(self.URL)
@@ -18,9 +20,8 @@ class EuroNews:
         author = author_a.text.strip() if author_a else None
         return author
 
-    def parse_articles(self):
+    def fetch_articles(self):
         soup = BeautifulSoup(self.html, "html.parser")
-        results = []
     
         for li in soup.select('li.flex.flex-row'):
             raw_date_el = li.select_one('time')
@@ -43,29 +44,23 @@ class EuroNews:
             category_span = li.find('span', class_=lambda c: c and 'text-neon-blue' in c)
             category = category_span.text.strip() if category_span else None
 
+            print(f"[DOWNLOAD] Fetching article from URL: {link}...")
             article = download_site(link)
             author = self.get_author(article)
 
+            print(f"[LLM] Getting AI description from URL: {link}...")
             description = get_description(link)
     
-            results.append({
+            result = {
                 "source": self.SITE,
                 "title": title,
                 "author": author,
                 "url": link,
                 "category": category,
-                "published_at": published_str,
+                "published_at":  published_str,
                 "content": content,
                 "description": description
-            })
-    
-        return results
-
-
-
-if __name__ == "__main__":
-    channel = EuroNews()
-    channel.load_list()
-    articles = channel.parse_articles()
-    for art in articles:
-        print(art)
+                }
+            
+            print(f"[INFO] Saving article to database...")
+            Database().save(result)

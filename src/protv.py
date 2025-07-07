@@ -2,11 +2,13 @@ from bs4 import BeautifulSoup
 from parser import download_site, conv_relative_date
 from urllib.parse import urljoin
 from llm import get_description
+from database import Database
 
 class ProTV:
     def __init__(self):
         self.URL = "https://stirileprotv.ro/ultimele-stiri/"
         self.SITE = "ProTV"
+        self.load_list()
 
     def load_list(self):
         self.html = download_site(self.URL)
@@ -23,10 +25,9 @@ class ProTV:
         auth = auth_tag.text.strip() if auth_tag else None
         return auth
 
-    def parse_articles(self):
+    def fetch_articles(self):
         soup = BeautifulSoup(self.html, "html.parser")
         articles = soup.select("article.grid.article")
-        results = []
 
         for article in articles:
             title_tag = article.select_one(".article-title a")
@@ -48,30 +49,24 @@ class ProTV:
             else:
                 published_str = None
 
+            print(f"[DOWNLOAD] Fetching article from URL: {link}...")
             curr_art = download_site(link)
             author = self.get_author(curr_art)
             category = self.get_category(curr_art)
 
+            print(f"[LLM] Getting AI description from URL: {link}...")
             description = get_description(link)
 
-            results.append({
-                "source": "ProTV",
+            result = {
+                "source": self.SITE,
                 "title": title,
                 "author": author,
                 "url": link,
                 "category": category,
-                "published_at": published_str,
+                "published_at":  published_str,
                 "content": content,
                 "description": description
-            })
-
-        return results
-
-
-if __name__ == "__main__": 
-    channel = ProTV()
-    channel.load_list()
-    articles = channel.parse_articles()
-
-    for art in articles:
-        print(art)
+                }
+            
+            print(f"[INFO] Saving article to database...")
+            Database().save(result)

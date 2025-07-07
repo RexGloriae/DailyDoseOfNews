@@ -2,11 +2,13 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from parser import download_site
 from llm import get_description
+from database import Database
 
 class HotNews:
     def __init__(self):
         self.URL = "https://hotnews.ro/ultima-ora"
         self.SITE = "HotNews"
+        self.load_list()
     
     def load_list(self):
         self.html = download_site(self.URL)
@@ -17,9 +19,8 @@ class HotNews:
         author = author_a.text.strip() if author_a else None
         return author
 
-    def parse_articles(self):
+    def fetch_articles(self):
         soup = BeautifulSoup(self.html, "html.parser")
-        results = []
         today = datetime.now().date()
 
         articles = soup.select("article.ultima-ora")
@@ -47,28 +48,23 @@ class HotNews:
             excerpt_tag = article.select_one("a.excerpt")
             content = excerpt_tag.get_text(strip=True) if excerpt_tag else None
 
+            print(f"[DOWNLOAD] Fetching article from URL: {link}...")
             curr_art = download_site(link)
             author = self.get_author(curr_art)
 
-            print(f"Getting AI description for {link}...")
+            print(f"[LLM] Getting AI description from URL: {link}...")
             description = get_description(link)
 
-            results.append({
-                "source": "HotNews",
+            result = {
+                "source": self.SITE,
                 "title": title,
                 "author": author,
                 "url": link,
                 "category": category,
-                "published_at": published_dt.strftime("%d/%m/%y %H:%M"),
+                "published_at":  published_dt.strftime("%d/%m/%y %H:%M"),
                 "content": content,
                 "description": description
-            })
-
-        return results
-    
-if __name__ == "__main__":
-    channel = HotNews()
-    channel.load_list()
-    articles = channel.parse_articles()
-    for art in articles:
-        print(art)
+                }
+            
+            print(f"[INFO] Saving article to database...")
+            Database().save(result)
