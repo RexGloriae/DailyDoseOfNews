@@ -14,5 +14,7 @@ def main():
     ch_hot.fetch_articles()
     ch_pro.fetch_articles()
 
+    print("[INFO] All articles have been fetched successfully...")
+
 if __name__ == "__main__":
     main()
