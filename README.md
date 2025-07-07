@@ -16,14 +16,38 @@ A Python Web-Scraper for automated collection of news from well-known sources, s
 The project has been designed to be easily extended and to run periodically, either manually or timed.
 
 ## 🏁 Fast setup
-1. Install all the requirements using `pip install requirements.txt`.
-2. Generate an API Key from AI Studio.
-3. Run the following command in the project directory: `mkdir src/hidden && touch src/hidden/key.py`
-4. In `key.py` write the following line `API_KEY = "" # your key goes here` then save.
-
-### 1️⃣ Clonează proiectul
+### 1️⃣ Clone the project
 
 ```bash
 git clone https://github.com/USERNAME/DailyDoseOfNews.git
 cd DailyDoseOfNews
 ```
+
+### 2️⃣ Create a virtual environment
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 3️⃣ Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 4️⃣ Add AI Studio API Key
+Create the file:
+```bash
+src/secret/key.py
+```
+and add the following line:
+```python
+API_KEY = "your_key"
+```
+
+## ⚡️ How to run
+```bash
+python3 main.py
+```
+
+## 👨‍💻 Author
+Codreanu Andrei-Daniel
