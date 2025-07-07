@@ -1,3 +1,5 @@
+<img src="https://img.shields.io/badge/Google%20Gemini-8E75B2?style=for-the-badge&logo=googlegemini&logoColor=white"/>
+<img src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue"/>
 # 🗞️ DailyDoseOfNews 🗞️
 
 A Python Web-Scraper for automated collection of news from well-known sources, storing them in a database and presenting them trough a REST API
