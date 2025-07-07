@@ -1,20 +1,6 @@
 from bs4 import BeautifulSoup
-from datetime import datetime, timedelta
-from parser import download_site
+from parser import download_site, conv_relative_date
 from urllib.parse import urljoin
-import re
-
-def conv_relative_date(text):
-    now = datetime.now()
-    text = text.strip().lower()
-    if "minute" in text:
-        minutes = int(re.search(r"(\d+)", text).group(1))
-        return now - timedelta(minutes=minutes)
-    elif "ora" in text or "ore" in text:
-        hours = int(re.search(r"(\d+)", text).group(1))
-        return now - timedelta(hours=hours)
-    else:
-        return "expired"
 
 class ProTV:
     def __init__(self):
@@ -55,7 +41,7 @@ class ProTV:
                 "title": title,
                 "url": link,
                 "published_at": published_str,
-                "content": content,
+                "content": content
             })
 
         return results
