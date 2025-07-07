@@ -9,7 +9,18 @@ class ProTV:
 
     def load_list(self):
         self.html = download_site(self.URL)
+
+    def get_category(self, art_html):
+        soup = BeautifulSoup(art_html, "html.parser")
+        cat_tag = soup.select_one('div.article--section-information a')
+        cat = cat_tag.text.strip() if cat_tag else None
+        return cat
     
+    def get_author(self, art_html):
+        soup = BeautifulSoup(art_html, "html.parser")
+        auth_tag = soup.select_one('div.author--name a')
+        auth = auth_tag.text.strip() if auth_tag else None
+        return auth
 
     def parse_articles(self):
         soup = BeautifulSoup(self.html, "html.parser")
@@ -36,10 +47,16 @@ class ProTV:
             else:
                 published_str = None
 
+            curr_art = download_site(link)
+            author = self.get_author(curr_art)
+            category = self.get_category(curr_art)
+
             results.append({
                 "source": "ProTV",
                 "title": title,
+                "author": author,
                 "url": link,
+                "category": category,
                 "published_at": published_str,
                 "content": content
             })

@@ -11,6 +11,12 @@ class EuroNews:
     def load_list(self):
         self.html = download_site(self.URL)
 
+    def get_author(self, article_html):
+        soup = BeautifulSoup(article_html, "html.parser")
+        author_a = soup.find('a', href=lambda h: h and h.startswith('/autor/'))
+        author = author_a.text.strip() if author_a else None
+        return author
+
     def parse_articles(self):
         soup = BeautifulSoup(self.html, "html.parser")
         results = []
@@ -32,11 +38,19 @@ class EuroNews:
     
             content_a = li.select_one('div.line-clamp-3 a')
             content = content_a.text.strip() if content_a else None
+
+            category_span = li.find('span', class_=lambda c: c and 'text-neon-blue' in c)
+            category = category_span.text.strip() if category_span else None
+
+            article = download_site(link)
+            author = self.get_author(article)
     
             results.append({
                 "source": self.SITE,
                 "title": title,
+                "author": author,
                 "url": link,
+                "category": category,
                 "published_at": published_str,
                 "content": content
             })
