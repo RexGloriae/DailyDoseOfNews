@@ -37,6 +37,10 @@ class ProTV:
             link = title_tag.get("href")
             link = urljoin(self.URL, link)
 
+            if Database().article_exists(link) is True:
+                print(f"[INFO] The database already has the article with URL: {link} - skipping...")
+                continue 
+
             lead_tag = article.select_one(".article-lead")
             content = lead_tag.get_text(strip=True) if lead_tag else None
 

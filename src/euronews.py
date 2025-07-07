@@ -37,7 +37,11 @@ class EuroNews:
             a_title = li.select_one('h1 a')
             title = a_title.text.strip() if a_title else None
             link = urljoin(self.URL, a_title['href']) if a_title else None
-    
+
+            if Database().article_exists(link) is True:
+                print(f"[INFO] The database already has the article with URL: {link} - skipping...")
+                continue 
+                
             content_a = li.select_one('div.line-clamp-3 a')
             content = content_a.text.strip() if content_a else None
 

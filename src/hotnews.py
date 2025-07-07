@@ -42,6 +42,10 @@ class HotNews:
             title = title_tag.get_text(strip=True) if title_tag else None
             link = title_tag.get("href") if title_tag else None
 
+            if Database().article_exists(link) is True:
+                print(f"[INFO] The database already has the article with URL: {link} - skipping...")
+                continue 
+
             cat_tag = article.select_one(".hn-category-tag a")
             category = cat_tag.get_text(strip=True) if cat_tag else None
 
