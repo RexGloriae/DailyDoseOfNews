@@ -121,7 +121,7 @@ class Database:
         conn = sqlite3.connect(self.db_name)
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
-        c.execute('SELECT * FROM articles WHERE favorites=1')
+        c.execute('SELECT * FROM articles WHERE favorite=1')
         rows = c.fetchall()
         conn.close()
         articles = [dict(row) for row in rows]
@@ -153,6 +153,7 @@ class Database:
 
     def get_stats(self):
         conn = sqlite3.connect(self.db_name)
+        conn.row_factory = sqlite3.Row
         c = conn.cursor()
         c.execute('SELECT COUNT(*) FROM articles')
         total = c.fetchone()[0]
