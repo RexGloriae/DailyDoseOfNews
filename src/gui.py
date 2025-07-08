@@ -29,6 +29,7 @@ class NewsApp:
             {"label": "📥 Load articles", "value": "load"},
             {"label": "📝 Fill Descriptions", "value": "fill"},
             {"label": "🔎 Search", "value": "search"},
+            {"label": "🔄 Refresh", "value": "refresh"},
             {"label": "🗂️ Filter by Source", "value": "filter"},
             {"label": "⭐ Favorites", "value": "fav"},
             {"label": "📊 Stats", "value": "stats"},
@@ -117,6 +118,9 @@ class NewsApp:
             self.mark_favorite(int(btn_val.split('_')[1]))
         elif btn_val == "search":
             self.search()
+        elif btn_val == "refresh":
+            self.load_all_articles()
+            self.news_app()
         #elif btn_val == "fav":
 
         #elif btn_val == "filter":
