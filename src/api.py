@@ -56,7 +56,7 @@ def search():
 @app.route('/articles/source/<source>', methods=['GET'])
 def by_source(source):
     print(f"[SEARCH] Searching all articles from: {source}...")
-    results = Database().get_by_source(source)
+    results = Database().get_by_src(source)
     if results is None:
         results = []
         print("[SEARCH] No articles were found...")
