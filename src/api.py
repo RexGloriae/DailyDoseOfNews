@@ -39,6 +39,38 @@ def delete_by_date():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
+from flask import request
+
+@app.route('/articles/search', methods=['GET'])
+def search():
+    q = request.args.get('q', '')
+    results = Database().search_articles(q)
+    return jsonify(results)
+
+@app.route('/articles/source/<source>', methods=['GET'])
+def by_source(source):
+    results = Database().get_by_source(source)
+    return jsonify(results)
+
+@app.route('/articles/mark_read/<int:article_id>', methods=['POST'])
+def mark_read(article_id):
+    Database().mark_as_read(article_id)
+    return jsonify({"status": "ok"})
+
+@app.route('/articles/favorite/<int:article_id>', methods=['POST'])
+def mark_favorite(article_id):
+    Database().mark_as_favorite(article_id)
+    return jsonify({"status": "ok"})
+
+@app.route('/articles/favorites', methods=['GET'])
+def get_favorites():
+    results = Database().get_favorites()
+    return jsonify(results)
+
+@app.route('/articles/stats', methods=['GET'])
+def get_stats():
+    stats = Database().get_stats()
+    return jsonify(stats)
 
 
 if __name__ == '__main__':
