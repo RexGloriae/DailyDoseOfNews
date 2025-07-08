@@ -15,6 +15,11 @@ A Python Web-Scraper for automated collection of news from well-known sources, s
 <ul>✅ Generates descriptions of each article using AI Studio</ul>
 <ul>✅ Uses a REST API to provide the articles</ul>
 <ul>✅ Provides a web based client for the user</ul>
+<ul>✅ Provides different statistics for articles</ul>
+<ul>✅ Provides search functions for finding articles with ease</ul>
+<ul>✅ Filters articles by source</ul>
+<ul>✅ Articles can be marked as read and/or as favorite</ul>
+<ul>✅ Favorite articles are shown in their own tab</ul>
 
 The project has been designed to be easily extended.
 
@@ -46,6 +51,7 @@ and add the following line:
 ```python
 API_KEY = "your_key"
 ```
+You need to use your own API Key for AI Studio.
 
 ## ⚡️ How to run
 Enter the virtual environment by running
