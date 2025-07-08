@@ -130,8 +130,8 @@ class NewsApp:
         elif btn_val == "refresh":
             self.load_all_articles()
             self.news_app()
-        #elif btn_val == "fav":
-
+        elif btn_val == "fav":
+            self.show_favorites()
         #elif btn_val == "filter":
 
         #elif btn_val == "stats":
