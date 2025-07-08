@@ -167,7 +167,6 @@ class Database:
 
     def get_stats(self):
         conn = sqlite3.connect(self.db_name)
-        conn.row_factory = sqlite3.Row
         c = conn.cursor()
         c.execute('SELECT COUNT(*) FROM articles')
         total = c.fetchone()[0]
