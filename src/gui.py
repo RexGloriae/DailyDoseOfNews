@@ -153,9 +153,11 @@ class NewsApp:
         source = input("Introdu sursa (EuroNews, HotNews, ProTV): ")
         if not source:
             self.load_all_articles()
+            self.news_app()
             return
         try:
             self.load_articles_from(source)
+            self.news_app()
         except Exception as e:
             put_error(f"Error while filtering: {e}...")
 
