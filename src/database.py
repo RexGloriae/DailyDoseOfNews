@@ -137,6 +137,7 @@ class Database:
     
     def search_articles(self, keyword):
         conn = sqlite3.connect(self.db_name)
+        conn.row_factory = sqlite3.Row
         c = conn.cursor()
         like_kw = f"%{keyword}%"
         c.execute('''
