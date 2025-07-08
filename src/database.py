@@ -119,6 +119,7 @@ class Database:
 
     def get_favorites(self):
         conn = sqlite3.connect(self.db_name)
+        conn.row_factory = sqlite3.Row
         c = conn.cursor()
         c.execute('SELECT * FROM articles WHERE favorites=1')
         rows = c.fetchall()
@@ -128,6 +129,7 @@ class Database:
     
     def get_by_src(self, src):
         conn = sqlite3.connect(self.db_name)
+        conn.row_factory = sqlite3.Row
         c = conn.cursor()
         c.execute('SELECT * FROM articles WHERE source=?', (src,))
         rows = c.fetchall()
