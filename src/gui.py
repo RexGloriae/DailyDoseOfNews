@@ -21,6 +21,9 @@ class NewsApp:
     def load_favorite_articles(self):
         self.articles = requests.get(f"{API_URL}/favorites").json()
 
+    def load_articles_from(self, source):
+        self.articles = requests.get(f"{API_URL}/source/{source}").json()
+
     def news_app(self):
         clear()
         put_markdown("# 📰 Daily Dose of News")
@@ -141,11 +144,21 @@ class NewsApp:
             self.news_app()
         elif btn_val == "fav":
             self.show_favorites()
-        #elif btn_val == "filter":
-
+        elif btn_val == "filter":
+            self.filter()
         elif btn_val == "stats":
             self.show_stats()
-            
+
+    def filter(self):
+        source = input("Introdu sursa (EuroNews, HotNews, ProTV): ")
+        if not source:
+            self.load_all_articles()
+            return
+        try:
+            self.load_articles_from(source)
+        except Exception as e:
+            put_error(f"Error while filtering: {e}...")
+
     def show_stats(self):
         try:
             stats = requests.get(f"{API_URL}/stats").json()            
