@@ -1,5 +1,6 @@
 from pywebio.output import *
 from pywebio.input import *
+from pywebio.session import set_env
 from pywebio import start_server
 import requests
 import time
@@ -10,7 +11,7 @@ class NewsApp:
     def __init__(self):
         self.articles = None
         self.load_all_articles()
-        start_server(self.news_app, port=8080, debug=True, title="Daily Dose of News")
+        start_server(self.news_app, port=8080, debug=True)
 
     def load_all_articles(self):
         self.articles = requests.get(API_URL).json()
@@ -26,6 +27,7 @@ class NewsApp:
 
     def news_app(self):
         clear()
+        set_env(title="📰 Daily Dose of News")
         put_markdown("# 📰 Daily Dose of News")
         self.buttons_panel()
         self.articles_panel()
@@ -59,7 +61,7 @@ class NewsApp:
                         put_text(article.get('description') or "Fără descriere")
                         put_link("Citește mai mult", url=article['url'], new_window=True)
                         put_text("\n")
-                        
+
                         if article['read'] == 1:
                             put_buttons([
                                 {'label': '❌ Mark as not Read', 'value': f"unread_{article['id']}"},
