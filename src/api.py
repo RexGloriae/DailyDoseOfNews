@@ -95,7 +95,10 @@ def get_favorites():
 
 @app.route('/articles/stats', methods=['GET'])
 def get_stats():
+    print("[INFO] Getting statistics...")
     stats = Database().get_stats()
+    if stats is None:
+        stats = []
     return jsonify(stats)
 
 
