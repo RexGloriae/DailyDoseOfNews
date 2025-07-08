@@ -64,6 +64,7 @@ class Database:
         return exists
     
     def fill_missing_descriptions(self):
+        print("[INFO] Trying to fill missing descripitons...")
         conn = sqlite3.connect(self.db_name)
         c = conn.cursor()
 
@@ -92,4 +93,11 @@ class Database:
             except Exception as e:
                 print(f"[ERROR] Failed to generate description for {url}: {e}...")
 
+        conn.close()
+
+    def delete_articles_by_date(self, day_str):
+        conn = sqlite3.connect(self.db_name)
+        c = conn.cursor()
+        c.execute("DELETE FROM articles WHERE published_at LIKE ?", (f"{day_str}%",))
+        conn.commit()
         conn.close()
