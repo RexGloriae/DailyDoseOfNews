@@ -134,6 +134,7 @@ class Database:
         conn.close()
         articles = [dict(row) for row in rows]
         return articles    
+    
     def search_articles(self, keyword):
         conn = sqlite3.connect(self.db_name)
         c = conn.cursor()
