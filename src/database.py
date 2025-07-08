@@ -16,7 +16,9 @@ class Database:
             category TEXT,
             published_at TEXT,
             content TEXT,
-            description TEXT
+            description TEXT,
+            read INTEGER DEFAULT 0,
+            favorite INTEGER DEFAULT 0
             )
         ''')
         conn.commit()
@@ -27,8 +29,8 @@ class Database:
         c = conn.cursor()
         try:
             c.execute('''
-                INSERT INTO articles (source, title, author, url, category, published_at, content, description)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO articles (source, title, author, url, category, published_at, content, description, read, favorite)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 0)
             ''', (
                 article.get('source'),
                 article.get('title'),
@@ -80,7 +82,6 @@ class Database:
             try:
                 description = get_description(url)
                 if description:
-                    # 2. Update row
                     c.execute(
                         "UPDATE articles SET description = ? WHERE id = ?",
                         (description, article_id)
@@ -101,3 +102,64 @@ class Database:
         c.execute("DELETE FROM articles WHERE published_at LIKE ?", (f"{day_str}%",))
         conn.commit()
         conn.close()
+
+    def mark_as_read(self, art_id):
+        conn = sqlite3.connect(self.db_name)
+        c = conn.cursor()
+        c.execute('UPDATE articles SET read=1 WHERE id=?', (art_id,))
+        conn.commit()
+        conn.close()
+
+    def mark_as_favorite(self, art_id):
+        conn = sqlite3.connect(self.db_name)
+        c = conn.cursor()
+        c.execute('UPDATE articles SET favorite=1 WHERE id=?', (art_id,))
+        conn.commit()
+        conn.close()
+
+    def get_favorites(self):
+        conn = sqlite3.connect(self.db_name)
+        c = conn.cursor()
+        c.execute('SELECT * FROM articles WHERE favorites=1')
+        rows = c.fetchall()
+        conn.close()
+        return self._format_rows(rows)
+    
+    def get_by_src(self, src):
+        conn = sqlite3.connect(self.db_name)
+        c = conn.cursor()
+        c.execute('SELECT * FROM articles WHERE source=?', (src,))
+        rows = c.fetchall()
+        conn.close()
+        return self._format_rows(rows)
+    
+    def search_articles(self, keyword):
+        conn = sqlite3.connect(self.db_name)
+        c = conn.cursor()
+        like_kw = f"%{keyword}%"
+        c.execute('''
+            SELECT * FROM articles 
+            WHERE title LIKE ? OR content LIKE ? OR description LIKE ?
+        ''', (like_kw, like_kw, like_kw))
+        rows = c.fetchall()
+        conn.close()
+        return self._format_rows(rows)
+
+    def get_stats(self):
+        conn = sqlite3.connect(self.db_name)
+        c = conn.cursor()
+        c.execute('SELECT COUNT(*) FROM articles')
+        total = c.fetchone()[0]
+    
+        c.execute('SELECT source, COUNT(*) FROM articles GROUP BY source')
+        per_source = c.fetchall()
+    
+        c.execute('SELECT substr(published_at, 1, 8) AS day, COUNT(*) FROM articles GROUP BY day')
+        per_day = c.fetchall()
+    
+        conn.close()
+        return {
+            "total": total,
+            "per_source": per_source,
+            "per_day": per_day
+        }
