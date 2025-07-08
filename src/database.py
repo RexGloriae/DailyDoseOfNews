@@ -163,3 +163,21 @@ class Database:
             "per_source": per_source,
             "per_day": per_day
         }
+
+    def _format_rows(self, rows):
+        result = []
+        for row in rows:
+            result.append({
+                "id": row[0],
+                "source": row[1],
+                "title": row[2],
+                "author": row[3],
+                "url": row[4],
+                "category": row[5],
+                "published_at": row[6],
+                "content": row[7],
+                "description": row[8],
+                "read": row[9],
+                "favorite": row[10]
+            })
+        return result
