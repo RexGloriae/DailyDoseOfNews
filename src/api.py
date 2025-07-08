@@ -44,10 +44,13 @@ from flask import request
 @app.route('/articles/search', methods=['GET'])
 def search():
     q = request.args.get('q', '')
+    print(f"[SEARCH] Searching for an article with the keyword: {q}...")
     results = Database().search_articles(q)
     if results is None:
         results = []
-    print(results)
+        print("[SEARCH] No result was found...")
+    else:
+        print("[SEARCH] Found matching article...")
     return jsonify(results)
 
 @app.route('/articles/source/<source>', methods=['GET'])
