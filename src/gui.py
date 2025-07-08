@@ -60,6 +60,11 @@ class NewsApp:
                             {'label': '✅ Mark as Read', 'value': f"read_{article['id']}"},
                             {'label': '⭐ Add Favorite', 'value': f"fav_{article['id']}"}
                         ], onclick=self.handle_buttons)
+                        put_buttons([
+                            {'label': '❌ Mark as not Read', 'value': f"unread_{article['id']}"},
+                            {'label': '💔 Remove from Favorite', 'value': f"unfav_{article['id']}"}
+                        ], onclick=self.handle_buttons)
+
                         put_markdown("---")
         except Exception as e:
             put_error(f"Eroare la încărcarea știrilor: {e}")
@@ -125,6 +130,10 @@ class NewsApp:
             self.mark_read(int(btn_val.split('_')[1]))
         elif btn_val.startswith('fav_'):
             self.mark_favorite(int(btn_val.split('_')[1]))
+        elif btn_val.startswith('unread_'):
+            self.unmark_read(int(btn_val.split('_')[1]))
+        elif btn_val.startswith('unfav_'):
+            self.unmark_favorite(int(btn_val.split('_')[1]))
         elif btn_val == "search":
             self.search()
         elif btn_val == "refresh":
@@ -147,6 +156,20 @@ class NewsApp:
         try:
             requests.post(f"{API_URL}/favorite/{article_id}")
             toast("⭐ Added to favorites!", duration=2)
+        except Exception as e:
+            toast(f"❌ Error: {e}")
+
+    def unmark_read(self, article_id):
+        try:
+            requests.post(f"{API_URL}/unmark_read/{article_id}")
+            toast("❌ Marked as not read!", duration=2)
+        except Exception as e:
+            toast(f"❌ Error: {e}")
+
+    def unmark_favorite(self, article_id):
+        try:
+            requests.post(f"{API_URL}/unfavorite/{article_id}")
+            toast("💔 Removed from favorites!", duration=2)
         except Exception as e:
             toast(f"❌ Error: {e}")
 

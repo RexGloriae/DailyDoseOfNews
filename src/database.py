@@ -117,6 +117,20 @@ class Database:
         conn.commit()
         conn.close()
 
+    def unmark_as_read(self, art_id):
+        conn = sqlite3.connect(self.db_name)
+        c = conn.cursor()
+        c.execute('UPDATE articles SET read=0 WHERE id=?', (art_id,))
+        conn.commit()
+        conn.close()
+
+    def unmark_as_favorite(self, art_id):
+        conn = sqlite3.connect(self.db_name)
+        c = conn.cursor()
+        c.execute('UPDATE articles SET favorite=0 WHERE id=?', (art_id,))
+        conn.commit()
+        conn.close()
+
     def get_favorites(self):
         conn = sqlite3.connect(self.db_name)
         conn.row_factory = sqlite3.Row

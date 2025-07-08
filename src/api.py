@@ -70,6 +70,18 @@ def mark_favorite(article_id):
     Database().mark_as_favorite(article_id)
     return jsonify({"status": "ok"})
 
+@app.route('/articles/unmark_read/<int:article_id>', methods=['POST'])
+def unmark_read(article_id):
+    print(f"[INFO] Marking as not read article with id: {article_id}")
+    Database().unmark_as_read(article_id)
+    return jsonify({"status": "ok"})
+
+@app.route('/articles/unfavorite/<int:article_id>', methods=['POST'])
+def unmark_favorite(article_id):
+    print(f"[INFO] Removing as favorite article with id: {article_id}")
+    Database().unmark_as_favorite(article_id)
+    return jsonify({"status": "ok"})
+
 @app.route('/articles/favorites', methods=['GET'])
 def get_favorites():
     print("[SEARCH] Searching for favorite articles...")
