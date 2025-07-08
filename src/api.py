@@ -60,17 +60,25 @@ def by_source(source):
 
 @app.route('/articles/mark_read/<int:article_id>', methods=['POST'])
 def mark_read(article_id):
+    print(f"[INFO] Marking as read article with id: {article_id}")
     Database().mark_as_read(article_id)
     return jsonify({"status": "ok"})
 
 @app.route('/articles/favorite/<int:article_id>', methods=['POST'])
 def mark_favorite(article_id):
+    print(f"[INFO] Marking as favorite article with id: {article_id}")
     Database().mark_as_favorite(article_id)
     return jsonify({"status": "ok"})
 
 @app.route('/articles/favorites', methods=['GET'])
 def get_favorites():
+    print("[SEARCH] Searching for favorite articles...")
     results = Database().get_favorites()
+    if results is None:
+        results = []
+        print("[SEARCH] No favorite article was found...")
+    else:
+        print("[SEARCH] Found favorite articles...")
     return jsonify(results)
 
 @app.route('/articles/stats', methods=['GET'])
