@@ -10,10 +10,14 @@ A Python Web-Scraper for automated collection of news from well-known sources, s
 
 **DailyDoseOfNews** is a modular scrapper which:
 
-✅ Collects articles from various news sources 
+✅ Collects articles from various news sources
+
 ✅ Stores articles in a SQLite Database  
+
 ✅ Generates descriptions of each article using AI Studio
+
 ✅ Uses a REST API to provide the articles
+
 ✅ Provides a web based client for the user
 
 The project has been designed to be easily extended.
