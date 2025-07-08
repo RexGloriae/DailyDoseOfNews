@@ -143,7 +143,23 @@ class NewsApp:
             self.show_favorites()
         #elif btn_val == "filter":
 
-        #elif btn_val == "stats":
+        elif btn_val == "stats":
+            self.show_stats()
+            
+    def show_stats(self):
+        try:
+            stats = requests.get(f"{API_URL}/stats").json()            
+            put_markdown("## 📊 **Statistics**")
+            put_text(f"Total articles: {stats['total']}")
+            put_markdown("### 🗂️ By Source:")
+            for src, count in stats['per_source']:
+                put_text(f"{src}: {count}")
+            put_markdown("### 📅 By Day:")
+            for day, count in stats['per_day']:
+                put_text(f"{day}: {count}")
+        except Exception as e:
+            put_error(f"Error at loading statistics: {e}...")
+            
 
     def mark_read(self, article_id):
         try:
