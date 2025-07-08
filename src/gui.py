@@ -59,14 +59,24 @@ class NewsApp:
                         put_text(article.get('description') or "Fără descriere")
                         put_link("Citește mai mult", url=article['url'], new_window=True)
                         put_text("\n")
-                        put_buttons([
-                            {'label': '✅ Mark as Read', 'value': f"read_{article['id']}"},
-                            {'label': '⭐ Add Favorite', 'value': f"fav_{article['id']}"}
-                        ], onclick=self.handle_buttons)
-                        put_buttons([
-                            {'label': '❌ Mark as not Read', 'value': f"unread_{article['id']}"},
-                            {'label': '💔 Remove from Favorite', 'value': f"unfav_{article['id']}"}
-                        ], onclick=self.handle_buttons)
+                        
+                        if article['read'] == 1:
+                            put_buttons([
+                                {'label': '❌ Mark as not Read', 'value': f"unread_{article['id']}"},
+                            ], onclick=self.handle_buttons)
+                        else:
+                            put_buttons([
+                                {'label': '✅ Mark as Read', 'value': f"read_{article['id']}"},
+                            ], onclick=self.handle_buttons)
+
+                        if article['favorite'] == 1:
+                            put_buttons([
+                                {'label': '💔 Remove from Favorite', 'value': f"unfav_{article['id']}"}
+                            ], onclick=self.handle_buttons)
+                        else:
+                            put_buttons([
+                                {'label': '⭐ Add Favorite', 'value': f"fav_{article['id']}"}
+                            ], onclick=self.handle_buttons)
 
                         put_markdown("---")
         except Exception as e:
@@ -166,6 +176,7 @@ class NewsApp:
             stats = requests.get(f"{API_URL}/stats").json()            
             put_markdown("## 📊 **Statistics**")
             put_text(f"Total articles: {stats['total']}")
+            put_text(f"Total days: {len(stats['per_day'])}")
             put_markdown("### 🗂️ By Source:")
             for src, count in stats['per_source']:
                 put_text(f"{src}: {count}")
