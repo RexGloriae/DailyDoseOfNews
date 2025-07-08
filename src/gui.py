@@ -4,6 +4,7 @@ from pywebio.session import set_env
 from pywebio import start_server
 import requests
 import time
+from datetime import datetime
 
 API_URL = "http://localhost:5000/articles"
 
@@ -47,53 +48,100 @@ class NewsApp:
     def articles_panel(self):
         try:
             articles_by_day = self.group_articles_by_day(self.articles)
-            for day, day_articles in articles_by_day.items():
-                with put_collapse(f"📅 {day}", open=False):
-                    for article in day_articles:
-                        status = ""
-                        if article['read'] == 1:
-                            status += "✅ Read  "
-                        if article['favorite'] == 1:
-                            status += "⭐ Favorite"
-                        put_markdown(f"## {article['title']}")
-                        put_markdown(f"### {status}")
-                        put_text(f"Sursa: {article['source']} | Autor: {article.get('author', 'N/A')} | Publicat la: {article['published_at']}")
-                        put_text(article.get('description') or "Fără descriere")
-                        put_link("Citește mai mult", url=article['url'], new_window=True)
-                        put_text("\n")
+            if not articles_by_day:
+                put_info("There are no available articles!")
+                return
 
-                        if article['read'] == 1:
-                            put_buttons([
-                                {'label': '❌ Mark as not Read', 'value': f"unread_{article['id']}"},
-                            ], onclick=self.handle_buttons)
-                        else:
-                            put_buttons([
-                                {'label': '✅ Mark as Read', 'value': f"read_{article['id']}"},
-                            ], onclick=self.handle_buttons)
+            today = datetime.now().strftime("%d%m%y")
+            days = sorted(articles_by_day.keys(), reverse=True)
 
-                        if article['favorite'] == 1:
-                            put_buttons([
-                                {'label': '💔 Remove from Favorite', 'value': f"unfav_{article['id']}"}
-                            ], onclick=self.handle_buttons)
-                        else:
-                            put_buttons([
-                                {'label': '⭐ Add Favorite', 'value': f"fav_{article['id']}"}
-                            ], onclick=self.handle_buttons)
+            if today in days:
+                default_day = today
+            else:
+                default_day = days[0]
+            
+            selected_day = select(
+                label="🗓️ Pick a day",
+                options=days,
+                value=default_day
+            )
 
-                        put_markdown("---")
+            day_articles = articles_by_day.get(selected_day, [])
+            if not day_articles:
+                put_info(f"There are no articles available for {selected_day}!")
+                return
+
+            with put_collapse(f"🗓️ News for {selected_day}", open=False):
+                for article in day_articles:
+                    status = ""
+                    if article['read'] == 1:
+                        status += "✅ Read  "
+                    if article['favorite'] == 1:
+                        status += "⭐ Favorite"
+                    put_markdown(f"## {article['title']}")
+                    put_markdown(f"### {status}")
+                    put_text(f"Sursa: {article['source']} | Autor: {article.get('author', 'N/A')} | Publicat la: {article['published_at']}")
+                    put_text(article.get('description') or "Fără descriere")
+                    put_link("Citește mai mult", url=article['url'], new_window=True)
+                    put_text("\n")
+
+                    if article['read'] == 1:
+                        put_buttons([
+                            {'label': '❌ Mark as not Read', 'value': f"unread_{article['id']}"},
+                        ], onclick=self.handle_buttons)
+                    else:
+                        put_buttons([
+                            {'label': '✅ Mark as Read', 'value': f"read_{article['id']}"},
+                        ], onclick=self.handle_buttons)
+
+                    if article['favorite'] == 1:
+                        put_buttons([
+                            {'label': '💔 Remove from Favorite', 'value': f"unfav_{article['id']}"}
+                        ], onclick=self.handle_buttons)
+                    else:
+                        put_buttons([
+                            {'label': '⭐ Add Favorite', 'value': f"fav_{article['id']}"}
+                        ], onclick=self.handle_buttons)
+
+                    put_markdown("---")
         except Exception as e:
             put_error(f"Eroare la încărcarea știrilor: {e}")
 
+    from datetime import datetime
+
     def group_articles_by_day(self, articles):
         articles_by_day = {}
+    
         for art in articles:
-            day = art['published_at'][:8]
-            if day not in articles_by_day:
-                articles_by_day[day] = []
-            articles_by_day[day].append(art)
-
-        sorted_days = sorted(articles_by_day.keys(), reverse=True)
+            # Parse the datetime
+            dt = datetime.strptime(art['published_at'], "%d/%m/%y %H:%M")
+            day_key = dt.strftime("%d/%m/%y")  # Keep day as dd/mm/yy
+    
+            if day_key not in articles_by_day:
+                articles_by_day[day_key] = []
+    
+            # Store the datetime object with the article
+            art['_datetime_obj'] = dt
+            articles_by_day[day_key].append(art)
+    
+        # Sort days descending (most recent date first)
+        sorted_days = sorted(
+            articles_by_day.keys(),
+            key=lambda d: datetime.strptime(d, "%d/%m/%y"),
+            reverse=True
+        )
+    
+        # Sort articles within each day by hour descending
+        for day in articles_by_day:
+            articles_by_day[day].sort(key=lambda a: a['_datetime_obj'], reverse=True)
+    
+        # Clean up _datetime_obj if you want
+        for day in articles_by_day:
+            for art in articles_by_day[day]:
+                del art['_datetime_obj']
+    
         return {day: articles_by_day[day] for day in sorted_days}
+
 
     def load_articles(self):
         put_info("Loading articles...")
