@@ -10,11 +10,11 @@ def articles():
     data = Database().get_all_articles()
     return jsonify(data)
 
-@app.route('/articles/refresh', methods=['POST'])
-def refresh():
+@app.route('/articles/load', methods=['POST'])
+def load():
     try:
         load_articles()
-        return jsonify({"status": "ok", "message": "Articles refreshed."})
+        return jsonify({"status": "ok", "message": "Articles loaded..."})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
     
@@ -45,6 +45,9 @@ from flask import request
 def search():
     q = request.args.get('q', '')
     results = Database().search_articles(q)
+    if results is None:
+        results = []
+    print(results)
     return jsonify(results)
 
 @app.route('/articles/source/<source>', methods=['GET'])
