@@ -2,7 +2,7 @@
 
 # 🗞️ DailyDoseOfNews 🗞️
 
-A Python Web-Scraper for automated collection of news from well-known sources, storing them in a database and presenting them trough a REST API
+A Python Web-Scraper for automated collection of news from well-known sources, storing them in a database and presenting them on a Web based client.
 
 ---
 
@@ -14,8 +14,9 @@ A Python Web-Scraper for automated collection of news from well-known sources, s
 ✅ Stores articles in a SQLite Database  
 ✅ Generates descriptions of each article using AI Studio
 ✅ Uses a REST API to provide the articles
+✅ Provides a web based client for the user
 
-The project has been designed to be easily extended and to run periodically, either manually or timed.
+The project has been designed to be easily extended.
 
 ## 🏁 Fast setup
 ### 1️⃣ Clone the project
@@ -47,16 +48,20 @@ API_KEY = "your_key"
 ```
 
 ## ⚡️ How to run
+Enter the virtual environment by running
+```bash
+source venv/bin/activate
+```
 Execute
 ```bash
-python3 main.py
+python3 src/api.py
 ```
-in order to fetch all news articles for the current day.
+in order to start the API which will provide you the data.
 Then execute
 ```bash
-python3 api.py
+python3 src/gui.py
 ```
-and you can find all the articles entering on address `http://127.0.0.1:5000/articles`.
+and you can open the application on web at `http://localhost:8080/articles`.
 
 ## 👨‍💻 Author
 Codreanu Andrei-Daniel
