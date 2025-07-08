@@ -3,7 +3,7 @@ from hotnews import HotNews
 from protv import ProTV
 from database import Database
 
-def main():
+def load_articles():
     print("[INFO] Initializing EuroNews...")
     ch_euro = EuroNews()
     print("[INFO] Initializing HotNews...")
@@ -16,11 +16,4 @@ def main():
     ch_pro.fetch_articles()
 
     print("[INFO] All articles have been fetched successfully...")
-
-    print("[INFO] Trying to fill missing descripitons...")
-    Database().fill_missing_descriptions()
-
     print("[EXIT] All jobs were executed - exiting...")
-
-if __name__ == "__main__":
-    main()
