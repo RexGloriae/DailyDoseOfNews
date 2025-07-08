@@ -55,7 +55,11 @@ def search():
 
 @app.route('/articles/source/<source>', methods=['GET'])
 def by_source(source):
+    print(f"[SEARCH] Searching all articles from: {source}...")
     results = Database().get_by_source(source)
+    if results is None:
+        results = []
+        print("[SEARCH] No articles were found...")
     return jsonify(results)
 
 @app.route('/articles/mark_read/<int:article_id>', methods=['POST'])
