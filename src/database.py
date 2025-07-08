@@ -123,7 +123,8 @@ class Database:
         c.execute('SELECT * FROM articles WHERE favorites=1')
         rows = c.fetchall()
         conn.close()
-        return self._format_rows(rows)
+        articles = [dict(row) for row in rows]
+        return articles
     
     def get_by_src(self, src):
         conn = sqlite3.connect(self.db_name)
@@ -131,8 +132,8 @@ class Database:
         c.execute('SELECT * FROM articles WHERE source=?', (src,))
         rows = c.fetchall()
         conn.close()
-        return self._format_rows(rows)
-    
+        articles = [dict(row) for row in rows]
+        return articles    
     def search_articles(self, keyword):
         conn = sqlite3.connect(self.db_name)
         c = conn.cursor()
@@ -143,7 +144,8 @@ class Database:
         ''', (like_kw, like_kw, like_kw))
         rows = c.fetchall()
         conn.close()
-        return self._format_rows(rows)
+        articles = [dict(row) for row in rows]
+        return articles
 
     def get_stats(self):
         conn = sqlite3.connect(self.db_name)
@@ -163,21 +165,3 @@ class Database:
             "per_source": per_source,
             "per_day": per_day
         }
-
-    def _format_rows(self, rows):
-        result = []
-        for row in rows:
-            result.append({
-                "id": row[0],
-                "source": row[1],
-                "title": row[2],
-                "author": row[3],
-                "url": row[4],
-                "category": row[5],
-                "published_at": row[6],
-                "content": row[7],
-                "description": row[8],
-                "read": row[9],
-                "favorite": row[10]
-            })
-        return result
