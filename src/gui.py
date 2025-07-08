@@ -18,6 +18,9 @@ class NewsApp:
     def load_articles_by_keyword(self, keyword):
         self.articles = requests.get(f"{API_URL}/search", params={'q': keyword}).json()       
 
+    def load_favorite_articles(self):
+        self.articles = requests.get(f"{API_URL}/favorites").json()
+
     def news_app(self):
         clear()
         put_markdown("# 📰 Daily Dose of News")
@@ -42,7 +45,13 @@ class NewsApp:
             for day, day_articles in articles_by_day.items():
                 with put_collapse(f"📅 {day}", open=False):
                     for article in day_articles:
-                        put_markdown(f"### {article['title']}")
+                        status = ""
+                        if article['read'] == 1:
+                            status += "✅ Read  "
+                        if article['favorite'] == 1:
+                            status += "⭐ Favorite"
+                        put_markdown(f"## {article['title']}")
+                        put_markdown(f"### {status}")
                         put_text(f"Sursa: {article['source']} | Autor: {article.get('author', 'N/A')} | Publicat la: {article['published_at']}")
                         put_text(article.get('description') or "Fără descriere")
                         put_link("Citește mai mult", url=article['url'], new_window=True)
@@ -150,6 +159,13 @@ class NewsApp:
             self.news_app()
         except Exception as e:
             put_error(f"Eroare la cautare: {e}")
+
+    def show_favorites(self):
+        try:
+            self.load_favorite_articles()
+            self.news_app()
+        except Exception as e:
+            put_error(f"Error loading favorite articles: {e}...")
 
 def main():
     app = NewsApp()
