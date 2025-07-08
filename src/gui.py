@@ -111,35 +111,30 @@ class NewsApp:
 
     def group_articles_by_day(self, articles):
         articles_by_day = {}
-    
+
         for art in articles:
-            # Parse the datetime
             dt = datetime.strptime(art['published_at'], "%d/%m/%y %H:%M")
-            day_key = dt.strftime("%d/%m/%y")  # Keep day as dd/mm/yy
-    
+            day_key = dt.strftime("%d/%m/%y")
+
             if day_key not in articles_by_day:
                 articles_by_day[day_key] = []
-    
-            # Store the datetime object with the article
+
             art['_datetime_obj'] = dt
             articles_by_day[day_key].append(art)
-    
-        # Sort days descending (most recent date first)
+
         sorted_days = sorted(
             articles_by_day.keys(),
             key=lambda d: datetime.strptime(d, "%d/%m/%y"),
             reverse=True
         )
-    
-        # Sort articles within each day by hour descending
+
         for day in articles_by_day:
             articles_by_day[day].sort(key=lambda a: a['_datetime_obj'], reverse=True)
-    
-        # Clean up _datetime_obj if you want
+
         for day in articles_by_day:
             for art in articles_by_day[day]:
                 del art['_datetime_obj']
-    
+
         return {day: articles_by_day[day] for day in sorted_days}
 
 
