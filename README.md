@@ -47,9 +47,16 @@ API_KEY = "your_key"
 ```
 
 ## ⚡️ How to run
+Execute
 ```bash
 python3 main.py
 ```
+in order to fetch all news articles for the current day.
+Then execute
+```bash
+python3 api.py
+```
+and you can find all the articles entering on address `http://127.0.0.1:5000/articles`.
 
 ## 👨‍💻 Author
 Codreanu Andrei-Daniel
