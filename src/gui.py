@@ -59,7 +59,7 @@ class NewsApp:
                 default_day = today
             else:
                 default_day = days[0]
-            
+
             selected_day = select(
                 label="🗓️ Pick a day",
                 options=days,
@@ -71,7 +71,7 @@ class NewsApp:
                 put_info(f"There are no articles available for {selected_day}!")
                 return
 
-            with put_collapse(f"🗓️ News for {selected_day}", open=False):
+            with put_collapse(f"🗓️ News for {selected_day}", open=True):
                 for article in day_articles:
                     status = ""
                     if article['read'] == 1:
@@ -145,7 +145,7 @@ class NewsApp:
             put_success(resp.json().get("message"))
             time.sleep(3)
             self.load_all_articles()
-            self.news_app()
+            self.refresh_ui()
         except Exception as e:
             put_error(f"Loading error: {e}")
 
@@ -155,7 +155,7 @@ class NewsApp:
             resp = requests.post(f"{API_URL}/fill_descriptions")
             put_success(resp.json().get("message"))
             time.sleep(3)
-            self.news_app()
+            self.refresh_ui()
         except Exception as e:
             put_error(f"Fill descriptions error: {e}")
 
@@ -173,7 +173,7 @@ class NewsApp:
                 resp = requests.delete(f"{API_URL}/by_date", json={"date": day_to_delete})
                 put_success(resp.json().get("message"))
                 self.load_all_articles()
-                self.news_app()
+                self.refresh_ui()
         except Exception as e:
             put_error(f"Delete error: {e}")
 
@@ -196,7 +196,7 @@ class NewsApp:
             self.search()
         elif btn_val == "refresh":
             self.load_all_articles()
-            self.news_app()
+            self.refresh_ui()
         elif btn_val == "fav":
             self.show_favorites()
         elif btn_val == "filter":
@@ -207,12 +207,10 @@ class NewsApp:
     def filter(self):
         source = input("Introdu sursa (EuroNews, HotNews, ProTV): ")
         if not source:
-            self.load_all_articles()
-            self.news_app()
             return
         try:
             self.load_articles_from(source)
-            self.news_app()
+            self.refresh_ui()
         except Exception as e:
             put_error(f"Error while filtering: {e}...")
 
@@ -266,16 +264,21 @@ class NewsApp:
             return
         try:
             self.load_articles_by_keyword(q)
-            self.news_app()
+            self.refresh_ui()
         except Exception as e:
             put_error(f"Eroare la cautare: {e}")
 
     def show_favorites(self):
         try:
             self.load_favorite_articles()
-            self.news_app()
+            self.refresh_ui()
         except Exception as e:
             put_error(f"Error loading favorite articles: {e}...")
+
+    def refresh_ui(self):
+        clear()
+        self.buttons_panel()
+        self.articles_panel()
 
 def main():
     app = NewsApp()
