@@ -54,22 +54,24 @@ API_KEY = "your_key"
 You need to use your own API Key for AI Studio.
 
 ## ⚡️ How to run
-1️⃣ Enter the virtual environment by running
+### 1️⃣ Enter the virtual environment
+#### Run the following comand:
 ```bash
 source venv/bin/activate
 ```
 
-2️⃣ Run
+### 2️⃣ Start the API needed for data 
+#### Run the following comand:
 ```bash
 python3 src/api.py
 ```
-in order to start the API which will provide you the data.
 
-3️⃣ Run
+### 3️⃣ Start the Web Server
+#### Run the following comand:
 ```bash
 python3 src/gui.py
 ```
-and you can open the application on web at `http://localhost:8080/articles`.
+###### The web server is found at the address `http://localhost:8080`.
 
 ## 👨‍💻 Author
 Codreanu Andrei-Daniel
