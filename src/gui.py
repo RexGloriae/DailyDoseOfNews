@@ -5,6 +5,7 @@ from pywebio import start_server
 import requests
 import time
 from datetime import datetime
+from logs import *
 
 API_URL = "http://localhost:5000/articles"
 
@@ -67,6 +68,7 @@ class NewsApp:
             articles_by_day = self.group_articles_by_day(self.articles)
             if not articles_by_day:
                 put_info("There are no available articles!")
+                logging.info("No available articles were found...")
                 return
 
             self.days = sorted(articles_by_day.keys(), reverse=True)
@@ -75,6 +77,7 @@ class NewsApp:
                 day_articles = articles_by_day.get(self.selected_day, [])
                 if not day_articles:
                     put_info(f"There are no articles available for {self.selected_day}!")
+                    logging.info(f"No available articles found for {self.selected_day}...")
                     return
 
                 with put_collapse(f"🗓️ News for {self.selected_day}", open=True):
@@ -113,7 +116,8 @@ class NewsApp:
             else:
                 self.show_placeholder()
         except Exception as e:
-            put_error(f"Eroare la încărcarea știrilor: {e}")
+            put_error(f"Error loading articles: {e}")
+            logging.error(f"{e}")
 
     from datetime import datetime
 
@@ -156,6 +160,7 @@ class NewsApp:
             self.refresh_ui()
         except Exception as e:
             put_error(f"Loading error: {e}")
+            logging.error(f"{e}")
 
     def fill_descriptions(self):
         put_info("Filling missing descriptions...")
@@ -166,6 +171,7 @@ class NewsApp:
             self.refresh_ui()
         except Exception as e:
             put_error(f"Fill descriptions error: {e}")
+            logging.error(f"{e}")
 
     def delete_articles(self):
         try:
@@ -173,10 +179,10 @@ class NewsApp:
             articles_by_day = self.group_articles_by_day(articles)
             days = list(articles_by_day.keys())
             if not days:
-                put_warning("Nu există zile de șters.")
+                put_warning("There are no days to delete.")
                 return
 
-            day_to_delete = select("Selectează ziua de șters:", days)
+            day_to_delete = select("Select which day to delete:", days)
             if day_to_delete:
                 resp = requests.delete(f"{API_URL}/by_date", json={"date": day_to_delete})
                 put_success(resp.json().get("message"))
@@ -184,6 +190,7 @@ class NewsApp:
                 self.refresh_ui()
         except Exception as e:
             put_error(f"Delete error: {e}")
+            logging.error(f"{e}")
 
     def handle_buttons(self, btn_val):
         self.selected_day = None
@@ -232,7 +239,7 @@ class NewsApp:
         self.refresh_ui()
 
     def filter(self):
-        source = input("Introdu sursa (EuroNews, HotNews, ProTV): ")
+        source = input("Enter source (EuroNews, HotNews, ProTV): ")
         if not source:
             return
         try:
@@ -240,6 +247,7 @@ class NewsApp:
             self.refresh_ui()
         except Exception as e:
             put_error(f"Error while filtering: {e}...")
+            logging.error(f"{e}")
 
     def show_stats(self):
         try:
@@ -255,6 +263,7 @@ class NewsApp:
                 put_text(f"{day}: {count}")
         except Exception as e:
             put_error(f"Error at loading statistics: {e}...")
+            logging.error(f"{e}")
             
 
     def mark_read(self, article_id):
@@ -293,7 +302,8 @@ class NewsApp:
             self.load_articles_by_keyword(q)
             self.refresh_ui()
         except Exception as e:
-            put_error(f"Eroare la cautare: {e}")
+            put_error(f"Error when searching: {e}")
+            logging.error(f"{e}")
 
     def show_favorites(self):
         try:
@@ -301,6 +311,7 @@ class NewsApp:
             self.refresh_ui()
         except Exception as e:
             put_error(f"Error loading favorite articles: {e}...")
+            logging.error(f"{e}")
 
     def refresh_ui(self):
         clear()

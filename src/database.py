@@ -1,5 +1,6 @@
 import sqlite3
 from llm import get_description
+from logs import *
 
 class Database:
     def __init__(self):
@@ -44,6 +45,7 @@ class Database:
             conn.commit()
         except sqlite3.IntegrityError:
             print(f"[INFO] Article already exists in DB: {article['url']}")
+            logging.info(f"Article already exists in DB: {article['url']}")
         finally:
             conn.close()
 
@@ -67,6 +69,7 @@ class Database:
     
     def fill_missing_descriptions(self):
         print("[INFO] Trying to fill missing descripitons...")
+        logging.info("Trying to fill missing descriptions...")
         conn = sqlite3.connect(self.db_name)
         c = conn.cursor()
 
@@ -74,10 +77,12 @@ class Database:
         rows = c.fetchall()
 
         print(f"[INFO] Found {len(rows)} articles missing description...")
+        logging.info(f"Found {len(rows)} articles missing description...")
 
         for row in rows:
             article_id, url, content = row
             print(f"[LLM] Getting AI description from URL: {url}...")
+            logging.info(f"Getting AI description from URL: {url}")
 
             try:
                 description = get_description(url)
@@ -88,11 +93,14 @@ class Database:
                     )
                     conn.commit()
                     print(f"[SUCCESS] Updated description for: {url}...")
+                    logging.info("Updated description...")
                 else:
                     print(f"[WARNING] No description generated for: {url}...")
+                    logging.warning("No description generated...")
 
             except Exception as e:
                 print(f"[ERROR] Failed to generate description for {url}: {e}...")
+                logging.error("Failed to generate description...")
 
         conn.close()
 

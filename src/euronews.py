@@ -4,6 +4,7 @@ from parser import download_site, conv_relative_date
 from urllib.parse import urljoin
 from llm import get_description
 from database import Database
+from logs import *
 
 class EuroNews:
     def __init__(self):
@@ -40,6 +41,7 @@ class EuroNews:
 
             if Database().article_exists(link) is True:
                 print(f"[INFO] The database already has the article with URL: {link} - skipping...")
+                logging.info("Skipping article: already exists in DB...")
                 continue 
                 
             content_a = li.select_one('div.line-clamp-3 a')
@@ -49,10 +51,12 @@ class EuroNews:
             category = category_span.text.strip() if category_span else None
 
             print(f"[DOWNLOAD] Fetching article from URL: {link}...")
+            logging.info(f"Downloading article from URL: {link}...")
             article = download_site(link)
             author = self.get_author(article)
 
             print(f"[LLM] Getting AI description from URL: {link}...")
+            logging.info("Getting AI description...")
             description = get_description(link)
     
             result = {
@@ -67,4 +71,5 @@ class EuroNews:
                 }
             
             print(f"[INFO] Saving article to database...")
+            logging.info("Saving article in DB...")
             Database().save(result)
