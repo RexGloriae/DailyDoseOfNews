@@ -31,16 +31,16 @@ git clone https://github.com/USERNAME/DailyDoseOfNews.git
 cd DailyDoseOfNews
 ```
 
-### 2️⃣ Create a virtual environment
+### 2️⃣ Give execution rights to the setup
 ```bash
-python3 -m venv venv
-source venv/bin/activate
+chmod +x setup.sh
 ```
 
-### 3️⃣ Install dependencies
+### 3️⃣ Run the setup script
 ```bash
-pip install -r requirements.txt
+./setup.sh
 ```
+#### NOTE: Python3 needs to be installed manually by the user prior to running the setup.
 
 ### 4️⃣ Add AI Studio API Key
 Create the file:
@@ -58,12 +58,14 @@ Enter the virtual environment by running
 ```bash
 source venv/bin/activate
 ```
-Execute
+
+Run
 ```bash
 python3 src/api.py
 ```
 in order to start the API which will provide you the data.
-Then execute
+
+Run
 ```bash
 python3 src/gui.py
 ```
