@@ -11,6 +11,8 @@ API_URL = "http://localhost:5000/articles"
 class NewsApp:
     def __init__(self):
         self.articles = None
+        self.selected_day = None
+        self.days = None
         self.load_all_articles()
         start_server(self.news_app, port=8080, debug=True)
 
@@ -34,16 +36,31 @@ class NewsApp:
         self.articles_panel()
 
     def buttons_panel(self):
-        put_buttons([
-            {"label": "📥 Load articles", "value": "load"},
-            {"label": "📝 Fill Descriptions", "value": "fill"},
-            {"label": "🔎 Search", "value": "search"},
-            {"label": "🔄 Refresh", "value": "refresh"},
-            {"label": "🗂️ Filter by Source", "value": "filter"},
-            {"label": "⭐ Favorites", "value": "fav"},
-            {"label": "📊 Stats", "value": "stats"},
-            {"label": "🗑️ Delete Older Day", "value": "del"}
-        ], onclick=self.handle_buttons)
+        put_column([
+            put_scope('top_controls'),
+            put_scope('day_selector')
+        ])
+
+        with use_scope('top_controls', clear=True):
+            put_markdown('### ⚙️ Controls')
+            put_buttons([
+                {"label": "📥 Load articles", "value": "load"},
+                {"label": "📝 Fill Descriptions", "value": "fill"},
+                {"label": "🔎 Search", "value": "search"},
+                {"label": "🔄 Refresh", "value": "refresh"},
+                {"label": "🗂️ Filter by Source", "value": "filter"},
+                {"label": "⭐ Favorites", "value": "fav"},
+                {"label": "📊 Stats", "value": "stats"},
+                {"label": "🗑️ Delete Older Day", "value": "del"}
+            ], onclick=self.handle_buttons)
+
+        put_markdown('---')
+        
+        with use_scope('day_selector', clear=True):
+            put_markdown('### 🗓️ Calendar')
+            put_buttons([
+                {"label": "🗓️ Pick a Day", "value": "pick_day"}
+            ], onclick=self.handle_buttons)
 
     def articles_panel(self):
         try:
@@ -52,58 +69,49 @@ class NewsApp:
                 put_info("There are no available articles!")
                 return
 
-            today = datetime.now().strftime("%d%m%y")
-            days = sorted(articles_by_day.keys(), reverse=True)
+            self.days = sorted(articles_by_day.keys(), reverse=True)
 
-            if today in days:
-                default_day = today
+            if self.selected_day is not None:
+                day_articles = articles_by_day.get(self.selected_day, [])
+                if not day_articles:
+                    put_info(f"There are no articles available for {self.selected_day}!")
+                    return
+
+                with put_collapse(f"🗓️ News for {self.selected_day}", open=True):
+                    for article in day_articles:
+                        status = ""
+                        if article['read'] == 1:
+                            status += "✅ Read  "
+                        if article['favorite'] == 1:
+                            status += "⭐ Favorite"
+                        put_markdown(f"## {article['title']}")
+                        put_markdown(f"### {status}")
+                        put_text(f"Sursa: {article['source']} | Autor: {article.get('author', 'N/A')} | Publicat la: {article['published_at']}")
+                        put_text(article.get('description') or "Fără descriere")
+                        put_link("Citește mai mult", url=article['url'], new_window=True)
+                        put_text("\n")
+
+                        if article['read'] == 1:
+                            put_buttons([
+                                {'label': '❌ Mark as not Read', 'value': f"unread_{article['id']}"},
+                            ], onclick=self.handle_buttons)
+                        else:
+                            put_buttons([
+                                {'label': '✅ Mark as Read', 'value': f"read_{article['id']}"},
+                            ], onclick=self.handle_buttons)
+
+                        if article['favorite'] == 1:
+                            put_buttons([
+                                {'label': '💔 Remove from Favorite', 'value': f"unfav_{article['id']}"}
+                            ], onclick=self.handle_buttons)
+                        else:
+                            put_buttons([
+                                {'label': '⭐ Add Favorite', 'value': f"fav_{article['id']}"}
+                            ], onclick=self.handle_buttons)
+
+                        put_markdown("---")
             else:
-                default_day = days[0]
-
-            selected_day = select(
-                label="🗓️ Pick a day",
-                options=days,
-                value=default_day
-            )
-
-            day_articles = articles_by_day.get(selected_day, [])
-            if not day_articles:
-                put_info(f"There are no articles available for {selected_day}!")
-                return
-
-            with put_collapse(f"🗓️ News for {selected_day}", open=True):
-                for article in day_articles:
-                    status = ""
-                    if article['read'] == 1:
-                        status += "✅ Read  "
-                    if article['favorite'] == 1:
-                        status += "⭐ Favorite"
-                    put_markdown(f"## {article['title']}")
-                    put_markdown(f"### {status}")
-                    put_text(f"Sursa: {article['source']} | Autor: {article.get('author', 'N/A')} | Publicat la: {article['published_at']}")
-                    put_text(article.get('description') or "Fără descriere")
-                    put_link("Citește mai mult", url=article['url'], new_window=True)
-                    put_text("\n")
-
-                    if article['read'] == 1:
-                        put_buttons([
-                            {'label': '❌ Mark as not Read', 'value': f"unread_{article['id']}"},
-                        ], onclick=self.handle_buttons)
-                    else:
-                        put_buttons([
-                            {'label': '✅ Mark as Read', 'value': f"read_{article['id']}"},
-                        ], onclick=self.handle_buttons)
-
-                    if article['favorite'] == 1:
-                        put_buttons([
-                            {'label': '💔 Remove from Favorite', 'value': f"unfav_{article['id']}"}
-                        ], onclick=self.handle_buttons)
-                    else:
-                        put_buttons([
-                            {'label': '⭐ Add Favorite', 'value': f"fav_{article['id']}"}
-                        ], onclick=self.handle_buttons)
-
-                    put_markdown("---")
+                self.show_placeholder()
         except Exception as e:
             put_error(f"Eroare la încărcarea știrilor: {e}")
 
@@ -178,6 +186,7 @@ class NewsApp:
             put_error(f"Delete error: {e}")
 
     def handle_buttons(self, btn_val):
+        self.selected_day = None
         if btn_val == "fill":
             self.fill_descriptions()
         elif btn_val == "del":
@@ -203,6 +212,24 @@ class NewsApp:
             self.filter()
         elif btn_val == "stats":
             self.show_stats()
+        elif btn_val == "pick_day":
+            self.select_a_day()
+    
+    def select_a_day(self):
+        today = datetime.now().strftime("%d%m%y")
+
+        if today in self.days:
+            default_day = today
+        else:
+            default_day = self.days[0]
+
+        self.selected_day = select(
+            label="🗓️ Pick a day",
+            options=self.days,
+            value=default_day
+        )
+
+        self.refresh_ui()
 
     def filter(self):
         source = input("Introdu sursa (EuroNews, HotNews, ProTV): ")
@@ -277,8 +304,32 @@ class NewsApp:
 
     def refresh_ui(self):
         clear()
+        put_markdown("# 📰 Daily Dose of News")
         self.buttons_panel()
         self.articles_panel()
+
+    def show_placeholder(self):
+        put_html("""
+        <div style="
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            height: 400px; 
+            border: 2px dashed #aaa; 
+            border-radius: 12px; 
+            background: linear-gradient(135deg, #f0f4ff, #d9e4ff);
+            color: #555;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        ">
+            <div style="font-size: 48px; margin-bottom: 20px;">📰</div>
+            <h3 style="margin-bottom: 12px;">Welcome to Daily Dose of News!</h3>
+            <p style="font-size: 18px; max-width: 320px; text-align: center; margin-bottom: 24px;">
+                Pick a day using the button above to see news articles.
+            </p>
+        </div>
+        """)
+
 
 def main():
     app = NewsApp()
