@@ -73,5 +73,7 @@ python3 src/gui.py
 ```
 ###### The web server is found at the address `http://localhost:8080`.
 
+### 4️⃣ Enjoy!
+
 ## 👨‍💻 Author
 Codreanu Andrei-Daniel
