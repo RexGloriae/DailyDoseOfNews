@@ -54,18 +54,18 @@ API_KEY = "your_key"
 You need to use your own API Key for AI Studio.
 
 ## ⚡️ How to run
-Enter the virtual environment by running
+1️⃣ Enter the virtual environment by running
 ```bash
 source venv/bin/activate
 ```
 
-Run
+2️⃣ Run
 ```bash
 python3 src/api.py
 ```
 in order to start the API which will provide you the data.
 
-Run
+3️⃣ Run
 ```bash
 python3 src/gui.py
 ```
