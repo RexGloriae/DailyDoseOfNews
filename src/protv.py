@@ -3,6 +3,7 @@ from parser import download_site, conv_relative_date
 from urllib.parse import urljoin
 from llm import get_description
 from database import Database
+from logs import *
 
 class ProTV:
     def __init__(self):
@@ -39,6 +40,7 @@ class ProTV:
 
             if Database().article_exists(link) is True:
                 print(f"[INFO] The database already has the article with URL: {link} - skipping...")
+                logging.info(f"Skipping article with url: {link}...")
                 continue 
 
             lead_tag = article.select_one(".article-lead")
@@ -54,10 +56,12 @@ class ProTV:
                 published_str = None
 
             print(f"[DOWNLOAD] Fetching article from URL: {link}...")
+            logging.info(f"Downloading article from {link}...")
             curr_art = download_site(link)
             author = self.get_author(curr_art)
             category = self.get_category(curr_art)
 
+            logging.info("Fetching AI description...")
             print(f"[LLM] Getting AI description from URL: {link}...")
             description = get_description(link)
 
@@ -73,4 +77,5 @@ class ProTV:
                 }
             
             print(f"[INFO] Saving article to database...")
+            logging.info("Saving article to database")
             Database().save(result)

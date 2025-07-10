@@ -2,6 +2,7 @@ from hidden.key import API_KEY
 from google import genai
 from google.genai import types
 from google.genai.errors import ClientError
+from logs import *
 
 client = genai.Client(api_key=API_KEY)
 
@@ -18,7 +19,9 @@ def get_description(link):
     except ClientError as e:
         if "RESOURCE_EXHAUSTED" in str(e):
             print(f"[Quota exceeded] Skipping article: {link}")
+            logging.warning("Quota of requests exceeded - skipping...")
             return None
         else:
             print(f"[ClientError] Unexpected error: {e}")
+            logging.error(f"Unexpected error: {e}...")
             return None
