@@ -27,7 +27,7 @@ The project has been designed to be easily extended.
 ### 1️⃣ Clone the project
 
 ```bash
-git clone https://github.com/USERNAME/DailyDoseOfNews.git
+git clone https://github.com/RexGloriae/DailyDoseOfNews.git
 cd DailyDoseOfNews
 ```
 
