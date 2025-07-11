@@ -14,19 +14,24 @@ class NewsApp:
         self.articles = None
         self.selected_day = None
         self.days = None
+        self.all = True
         self.load_all_articles()
         start_server(self.news_app, port=8080, debug=True)
 
     def load_all_articles(self):
+        self.all = True
         self.articles = requests.get(API_URL).json()
 
     def load_articles_by_keyword(self, keyword):
+        self.all = False
         self.articles = requests.get(f"{API_URL}/search", params={'q': keyword}).json()       
 
     def load_favorite_articles(self):
+        self.all = False
         self.articles = requests.get(f"{API_URL}/favorites").json()
 
     def load_articles_from(self, source):
+        self.all = False
         self.articles = requests.get(f"{API_URL}/source/{source}").json()
 
     def news_app(self):
@@ -79,47 +84,93 @@ class NewsApp:
                     put_info(f"There are no articles available for {self.selected_day}!")
                     logging.info(f"No available articles found for {self.selected_day}...")
                     return
-
-                with put_collapse(f"🗓️ News for {self.selected_day}", open=True):
-                    for article in day_articles:
-                        status = ""
-                        if article['read'] == 1:
-                            status += "✅ Read  "
-                        if article['favorite'] == 1:
-                            status += "⭐ Favorite"
-                        put_markdown(f"## {article['title']}")
-                        put_markdown(f"### {status}")
-                        put_text(f"Sursa: {article['source']} | Autor: {article.get('author', 'N/A')} | Publicat la: {article['published_at']}")
-                        put_text(article.get('description') or "Fără descriere")
-                        put_link("Citește mai mult", url=article['url'], new_window=True)
-                        put_text("\n")
-
-                        if article['read'] == 1:
-                            put_buttons([
-                                {'label': '❌ Mark as not Read', 'value': f"unread_{article['id']}"},
-                            ], onclick=self.handle_buttons)
-                        else:
-                            put_buttons([
-                                {'label': '✅ Mark as Read', 'value': f"read_{article['id']}"},
-                            ], onclick=self.handle_buttons)
-
-                        if article['favorite'] == 1:
-                            put_buttons([
-                                {'label': '💔 Remove from Favorite', 'value': f"unfav_{article['id']}"}
-                            ], onclick=self.handle_buttons)
-                        else:
-                            put_buttons([
-                                {'label': '⭐ Add Favorite', 'value': f"fav_{article['id']}"}
-                            ], onclick=self.handle_buttons)
-
-                        put_markdown("---")
+                
+                self.print_day_articles(day_articles)
             else:
-                self.show_placeholder()
+                if self.all is True:
+                    self.show_placeholder()
+                else:
+                    self.print_all_articles(self.articles)
+
         except Exception as e:
             put_error(f"Error loading articles: {e}")
             logging.error(f"{e}")
+    
+    def print_all_articles(self, all_articles):
+        articles = self.group_articles_by_day(all_articles)
+        if not articles:
+                put_info("There are no available articles!")
+                logging.info("No available articles were found...")
+                return
+        for day, day_article in articles.items():
+            with put_collapse(f"🗓️ News for {day}", open=False):
+                for art in day_article:
+                    status = ""
+                    if art['read'] == 1:
+                        status += "✅ Read  "
+                    if art['favorite'] == 1:
+                        status += "⭐ Favorite"
 
-    from datetime import datetime
+                    put_markdown(f"## {art['title']}")
+                    put_markdown(f"### {status}")
+                    put_text(f"Sursa: {art['source']} | Autor: {art.get('author', 'N/A')} | Publicat la: {art['published_at']}")
+                    put_text(art.get('description') or "Fără descriere")
+                    put_link("Citește mai mult", url=art['url'], new_window=True)
+                    put_text("\n")
+
+                    if art['read'] == 1:
+                        put_buttons([
+                            {'label': '❌ Mark as not Read', 'value': f"unread_{art['id']}"},
+                        ], onclick=self.handle_buttons)
+                    else:
+                        put_buttons([
+                            {'label': '✅ Mark as Read', 'value': f"read_{art['id']}"},
+                        ], onclick=self.handle_buttons)
+                    if art['favorite'] == 1:
+                        put_buttons([
+                            {'label': '💔 Remove from Favorite', 'value': f"unfav_{art['id']}"}
+                        ], onclick=self.handle_buttons)
+                    else:
+                        put_buttons([
+                            {'label': '⭐ Add Favorite', 'value': f"fav_{art['id']}"}
+                        ], onclick=self.handle_buttons)
+
+                    put_markdown("---")
+
+    def print_day_articles(self, day_articles):
+        with put_collapse(f"🗓️ News for {self.selected_day}", open=True):
+            for article in day_articles:
+                status = ""
+                if article['read'] == 1:
+                    status += "✅ Read  "
+                if article['favorite'] == 1:
+                    status += "⭐ Favorite"
+
+                put_markdown(f"## {article['title']}")
+                put_markdown(f"### {status}")
+                put_text(f"Sursa: {article['source']} | Autor: {article.get('author', 'N/A')} | Publicat la: {article['published_at']}")
+                put_text(article.get('description') or "Fără descriere")
+                put_link("Citește mai mult", url=article['url'], new_window=True)
+                put_text("\n")
+
+                if article['read'] == 1:
+                    put_buttons([
+                        {'label': '❌ Mark as not Read', 'value': f"unread_{article['id']}"},
+                    ], onclick=self.handle_buttons)
+                else:
+                    put_buttons([
+                        {'label': '✅ Mark as Read', 'value': f"read_{article['id']}"},
+                    ], onclick=self.handle_buttons)
+                if article['favorite'] == 1:
+                    put_buttons([
+                        {'label': '💔 Remove from Favorite', 'value': f"unfav_{article['id']}"}
+                    ], onclick=self.handle_buttons)
+                else:
+                    put_buttons([
+                        {'label': '⭐ Add Favorite', 'value': f"fav_{article['id']}"}
+                    ], onclick=self.handle_buttons)
+
+                put_markdown("---")
 
     def group_articles_by_day(self, articles):
         articles_by_day = {}
